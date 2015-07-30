@@ -42,14 +42,15 @@ class PlaySoundsViewController: UIViewController {
     
     @IBAction func playSoundsFast(sender: UIButton) {
         playAudioWithRate(1.5)
-            }
+    }
     
     @IBAction func playChipmunkAudio(sender: UIButton) {
         playAudioWithVariablePitch(1000)
     }
     
     @IBAction func playDarthvaderAudio(sender: UIButton) {
-        playAudioWithVariablePitch(-1000)
+        //playAudioWithVariablePitch(-1000)
+        reverbEffect(50.0)
     }
     
     func playAudioWithVariablePitch(pitch: Float){
@@ -71,6 +72,28 @@ class PlaySoundsViewController: UIViewController {
         
         audioPlayerNode.play()
     }
+    
+    func reverbEffect(wetDryMix: Float){
+        
+        stopAllAudio()
+        
+        var audioNode = AVAudioPlayerNode()
+        engine.attachNode(audioNode)
+        
+        var reverb = AVAudioUnitReverb()
+        reverb.loadFactoryPreset(AVAudioUnitReverbPreset.Cathedral)
+        reverb.wetDryMix = wetDryMix
+        engine.attachNode(reverb)
+        
+        engine.connect(audioNode, to: reverb, format: nil)
+        engine.connect(reverb, to: engine.outputNode, format: nil)
+        
+        audioNode.scheduleFile(audioFile, atTime: nil, completionHandler: nil)
+        engine.startAndReturnError(nil)
+        
+        audioNode.play()
+    }
+    
     
     func playAudioWithRate(someRate: Float){
         
