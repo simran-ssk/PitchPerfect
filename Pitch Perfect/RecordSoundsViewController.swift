@@ -18,20 +18,15 @@ class RecodSoundsViewController: UIViewController, AVAudioRecorderDelegate {
     var audioRecorder:AVAudioRecorder!
     var recordedAudio:RecordedAudio!
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        
-    }
- 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        
     }
-
+    
     override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
         stopButton.hidden = true
     }
+    
   
     @IBAction func stopRecording(sender: AnyObject) {
         //Stop recording the users voice.
@@ -65,17 +60,18 @@ class RecodSoundsViewController: UIViewController, AVAudioRecorderDelegate {
         audioRecorder.prepareToRecord()
         audioRecorder.record()
     }
+    
     func audioRecorderDidFinishRecording(recorder: AVAudioRecorder!, successfully flag: Bool) {
         if(flag){
-        //save recorded audio
-        recordedAudio = RecordedAudio()
-        recordedAudio.filePathUrl = recorder.url
-        recordedAudio.title = recorder.url.lastPathComponent
-        //move to the next sceen, perform segue
-        self.performSegueWithIdentifier("stopRecording", sender: recordedAudio)
+            //save recorded audio
+            recordedAudio = RecordedAudio()
+            recordedAudio.filePathUrl = recorder.url
+            recordedAudio.title = recorder.url.lastPathComponent
+            //move to the next sceen, perform segue
+            self.performSegueWithIdentifier("stopRecording", sender: recordedAudio)
             
         }else{
-            println("Recording did not complete successfully")
+            recordingDidNotComplete()
             recordButton.enabled = true
             stopButton.hidden = true
         }
@@ -87,6 +83,12 @@ class RecodSoundsViewController: UIViewController, AVAudioRecorderDelegate {
             let data = sender as! RecordedAudio
             playSoundsVC.receivedAudio = data
         }
+    }
+    
+    func recordingDidNotComplete(){
+        let alert = UIAlertController(title: "Error", message: "Recording did not complete successfully", preferredStyle: UIAlertControllerStyle.Alert)
+        alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil))
+        self.presentViewController(alert, animated: true, completion: nil)
     }
 }
 
